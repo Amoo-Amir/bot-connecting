@@ -1,8 +1,3 @@
-// توکن ربات خود را از @BotFather بگیرید و اینجا بگذارید
-// بهتر است در بخش Settings > Variables کلادفلر به عنوان Environment Variable تعریفش کنید
-const BOT_TOKEN = env.BOT_TOKEN;
-
-// لیست بازی‌ها (اضافه کردن بازی جدید فقط با اضافه کردن یک خط به این لیست است!)
 const GAMES = {
   shabtaaz: { 
     name: "شب‌تاز", 
@@ -19,10 +14,11 @@ const GAMES = {
 };
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
+    // ✅ اینجا env در دسترس است و توکن را با امنیت کامل می‌خواند
+    const BOT_TOKEN = env.BOT_TOKEN;
     const url = new URL(request.url);
     
-    // دریافت آپدیت‌ها از تلگرام (Webhook)
     if (url.pathname === "/webhook") {
       const update = await request.json();
       
@@ -39,11 +35,8 @@ export default {
         }
 
         const gameInfo = GAMES[data.game] || { name: "بازی", emoji: "🎮" };
-        
-        // متن پیام نهایی
         const text = `🏆 <b>${userName}</b> در بازی <b>${gameInfo.name} ${gameInfo.emoji}</b>\nبه رکورد <b>${data.score}</b> امتیاز رسید!\n\n🔥 آیا می‌توانید رکورد او را بشکنید؟`;
 
-        // دکمه‌های زیر پیام
         const keyboard = {
           inline_keyboard: [
             [
@@ -53,7 +46,7 @@ export default {
           ]
         };
 
-        await sendTelegramRequest("sendMessage", {
+        await sendTelegramRequest(BOT_TOKEN, "sendMessage", {
           chat_id: chatId,
           text: text,
           parse_mode: "HTML",
@@ -78,7 +71,7 @@ export default {
           ]);
         }
 
-        await sendTelegramRequest("sendMessage", {
+        await sendTelegramRequest(BOT_TOKEN, "sendMessage", {
           chat_id: chatId,
           text: gamesText,
           parse_mode: "HTML",
@@ -93,7 +86,6 @@ export default {
         const chatId = update.callback_query.message.chat.id;
         const messageId = update.callback_query.message.message_id;
         
-        // ساخت مجدد لیست بازی‌ها (مشابه /start)
         const keyboard = { inline_keyboard: [] };
         for (const [key, game] of Object.entries(GAMES)) {
           keyboard.inline_keyboard.push([
@@ -101,14 +93,14 @@ export default {
           ]);
         }
 
-        await sendTelegramRequest("editMessageText", {
+        await sendTelegramRequest(BOT_TOKEN, "editMessageText", {
           chat_id: chatId,
           message_id: messageId,
           text: "🎮 لیست بازی‌های موجود:\nیکی را انتخاب کنید!",
           reply_markup: keyboard
         });
         
-        await sendTelegramRequest("answerCallbackQuery", { callback_query_id: update.callback_query.id });
+        await sendTelegramRequest(BOT_TOKEN, "answerCallbackQuery", { callback_query_id: update.callback_query.id });
         return new Response("OK");
       }
 
@@ -120,8 +112,8 @@ export default {
 };
 
 // تابع کمکی برای ارسال درخواست به API تلگرام
-async function sendTelegramRequest(method, data) {
-  return fetch(`https://api.telegram.org/bot${BOT_TOKEN}/${method}`, {
+async function sendTelegramRequest(token, method, data) {
+  return fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data)
