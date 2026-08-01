@@ -1,3 +1,5 @@
    name = "persian-games-bot"
    main = "index.js"
    compatibility_date = "2024-01-01"
+   # wrangler.toml
+name = 'bot-connecting2'
