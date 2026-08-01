@@ -1,6 +1,6 @@
 // توکن ربات خود را از @BotFather بگیرید و اینجا بگذارید
 // بهتر است در بخش Settings > Variables کلادفلر به عنوان Environment Variable تعریفش کنید
-const BOT_TOKEN = "8678576360:AAEwHhloV8X1cQWR7kuSLbcfhbIFhnXxQ6I"; 
+const BOT_TOKEN = env.BOT_TOKEN;
 
 // لیست بازی‌ها (اضافه کردن بازی جدید فقط با اضافه کردن یک خط به این لیست است!)
 const GAMES = {
