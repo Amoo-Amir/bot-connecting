@@ -14,15 +14,15 @@ const GAMES = {
 };
 
 export default {
+  // ✅ دقت کنید: env فقط و فقط در داخل این تابع تعریف شده است
   async fetch(request, env, ctx) {
-    // ✅ اینجا env در دسترس است و توکن را با امنیت کامل می‌خواند
-    const BOT_TOKEN = env.BOT_TOKEN;
+    const BOT_TOKEN = env.BOT_TOKEN; 
     const url = new URL(request.url);
     
     if (url.pathname === "/webhook") {
       const update = await request.json();
       
-      // ۱. مدیریت دریافت امتیاز از Web App
+      // ۱. دریافت امتیاز از بازی
       if (update.message && update.message.web_app_data) {
         const chatId = update.message.chat.id;
         const userName = update.message.from.first_name || "کاربر";
@@ -52,11 +52,10 @@ export default {
           parse_mode: "HTML",
           reply_markup: keyboard
         });
-        
         return new Response("OK");
       }
 
-      // ۲. مدیریت دستور /start
+      // ۲. دستور /start
       if (update.message && update.message.text === "/start") {
         const chatId = update.message.chat.id;
         const userName = update.message.from.first_name || "دوست عزیز";
@@ -77,11 +76,10 @@ export default {
           parse_mode: "HTML",
           reply_markup: keyboard
         });
-        
         return new Response("OK");
       }
 
-      // ۳. مدیریت کلیک روی دکمه "لیست بازی‌ها"
+      // ۳. دکمه لیست بازی‌ها
       if (update.callback_query && update.callback_query.data === "list_games") {
         const chatId = update.callback_query.message.chat.id;
         const messageId = update.callback_query.message.message_id;
@@ -111,7 +109,6 @@ export default {
   }
 };
 
-// تابع کمکی برای ارسال درخواست به API تلگرام
 async function sendTelegramRequest(token, method, data) {
   return fetch(`https://api.telegram.org/bot${token}/${method}`, {
     method: "POST",
